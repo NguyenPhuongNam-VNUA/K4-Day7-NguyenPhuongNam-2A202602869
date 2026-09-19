@@ -47,8 +47,19 @@ class SentenceChunker:
         self.max_sentences_per_chunk = max(1, max_sentences_per_chunk)
 
     def chunk(self, text: str) -> list[str]:
-        # TODO: split into sentences, group into chunks
-        raise NotImplementedError("Implement SentenceChunker.chunk")
+        if not text or not text.strip():
+            return []
+
+        # Split after sentence-ending punctuation followed by whitespace (keeps the punctuation mark)
+        sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
+        if not sentences:
+            return []
+
+        chunks: list[str] = []
+        for i in range(0, len(sentences), self.max_sentences_per_chunk):
+            chunk_sentences = sentences[i : i + self.max_sentences_per_chunk]
+            chunks.append(" ".join(chunk_sentences).strip())
+        return chunks
 
 
 class RecursiveChunker:
